@@ -20,6 +20,7 @@ public class Parser {
 
         String startDate = new String();
         String duration = new String();
+        String accessLogLocation = new String();
         int threshold = 0;
         for (String arg : args) {
            arg = arg.substring(2);
@@ -33,11 +34,14 @@ public class Parser {
                case "threshold":
                    threshold = Integer.parseInt(arg.split("=")[1]);
                    break;
+               case "accesslog":
+                   accessLogLocation = arg.split("=")[1];
+                   break;
            }
         }
 
         if (!alreadyRead()) {
-            readAccessLog();
+            readAccessLog(accessLogLocation);
         }
         System.out.println("Access.log already read");
         try {
@@ -123,10 +127,10 @@ public class Parser {
         return alreadyRead;
     }
 
-    private static void readAccessLog() {
+    private static void readAccessLog(String path) {
         try {
-            Path path = Paths.get("access.log");
-            List<String> contents = Files.readAllLines(path);
+            Path accessLogPath = Paths.get(path);
+            List<String> contents = Files.readAllLines(accessLogPath);
             Connection conn = ConnectionSingleton.getInstance().getConnection();
             AtomicInteger numberOfRecords = new AtomicInteger(0);
             contents.forEach(log -> {
